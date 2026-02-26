@@ -29,4 +29,4 @@ Uma aplicação Full-Stack desenvolvida para o gerenciamento de carteiras de inv
 
 **Kaique Santos**
 *Estudante de Análise e Desenvolvimento de Sistemas (ADS) - Fatec Ferraz*
-* [LinkedIn]([https://www.linkedin.com/in/kaiquehsfs/]).
+* [LinkedIn](https://www.linkedin.com/in/kaiquehsfs/).
