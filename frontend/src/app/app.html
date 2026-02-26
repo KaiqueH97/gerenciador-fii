@@ -1,0 +1,185 @@
+<main class="container">
+  
+  @if (!isAutenticado) {
+    <div style="max-width: 400px; margin: 100px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid var(--banco-orange);">
+      <h2 style="color: var(--banco-blue); margin-bottom: 20px;">Acesso ao Gerenciador</h2>
+      
+      <div class="form-group" style="text-align: left;">
+        <label>Usuário:</label>
+        <input type="text" [(ngModel)]="usuarioLogin" placeholder="Digite seu usuário" (keyup.enter)="fazerLogin()">
+      </div>
+      
+      <div class="form-group" style="text-align: left; margin-bottom: 25px;">
+        <label>Senha:</label>
+        <input type="password" [(ngModel)]="senhaLogin" placeholder="Digite sua senha" (keyup.enter)="fazerLogin()">
+      </div>
+
+      @if (erroLogin) {
+        <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-weight: bold;">
+          Usuário ou senha incorretos!
+        </div>
+      }
+
+      <button (click)="fazerLogin()" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px;">Entrar no Sistema</button>
+    </div>
+  }
+
+  @if (isAutenticado) {
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--banco-orange); padding-bottom: 10px; margin-bottom: 30px;">
+      <h1 class="header" style="border: none; margin: 0; padding: 0;">Gerenciador de Investimentos</h1>
+      <button (click)="sair()" class="btn-danger" style="flex: none; padding: 8px 15px;">Sair / Logout</button>
+    </div>
+
+    <div class="dashboard">
+      <div class="dash-card">
+        <h3>Patrimônio Total</h3>
+        <h1>R$ {{ totalPatrimonio.toFixed(2).replace('.', ',') }}</h1>
+      </div>
+
+      <div class="dash-card">
+        <h3>Dividendos Recebidos</h3>
+        <h1>R$ {{ totalDividendos.toFixed(2).replace('.', ',') }}</h1>
+      </div>
+    </div>
+
+    @if (!ativoSelecionadoParaDividendo) {
+      <div class="form-container" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <h3 style="color: var(--banco-blue); margin-top: 0;">Divisão da Carteira</h3>
+        <div style="width: 300px; height: 300px;">
+          <canvas id="graficoCarteira"></canvas>
+        </div>
+      </div>
+      
+      <div class="form-container">
+        <h3 style="color: var(--banco-orange);">
+          {{ novoAtivo.id ? '✏️ Editando Ativo: ' + novoAtivo.ticker : 'Adicionar Novo Ativo' }}
+        </h3>
+        
+        <form (ngSubmit)="adicionarAtivo()">
+          <div class="form-group">
+            <label>Ticker (Ex: MXRF11): </label>
+            <input type="text" name="ticker" [(ngModel)]="novoAtivo.ticker" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Tipo: </label>
+            <select name="tipo" [(ngModel)]="novoAtivo.tipo">
+              <option value="FII">FII</option>
+              <option value="ACAO">AÇÃO</option>
+              <option value="RENDA_FIXA">RENDA FIXA</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Quantidade de Cotas: </label>
+            <input type="number" name="quantidade" [(ngModel)]="novoAtivo.quantidadeCotas" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Valor Total Investido (R$): </label>
+            <input type="text" name="valorTotal" [(ngModel)]="valorTotalInvestido" required>
+            
+            @if (novoAtivo.quantidadeCotas > 0 && valorTotalInvestido) {
+              <small style="color: var(--success); font-weight: bold; display: block; margin-top: 5px;">
+                O Preço Médio calculado será: R$ {{ getPrecoMedioCalculado() }}
+              </small>
+            }
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button type="submit" class="btn-primary">Salvar Ativo</button>
+            
+            @if (novoAtivo.id) {
+              <button type="button" (click)="limparFormulario()" class="btn-secondary" style="margin-left: 10px;">
+                Cancelar Edição
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+
+      <h2 style="color: var(--banco-blue);">Minha Carteira:</h2>
+      
+      <div class="cards-grid">
+        @for (ativo of ativos; track ativo.id) {
+          <div class="ativo-card">
+            <div class="ativo-header">
+              <span class="ativo-ticker">{{ ativo.ticker }}</span>
+              <span class="ativo-tipo">{{ ativo.tipo }}</span>
+            </div>
+            
+            <div class="ativo-body">
+              <p>Quantidade: <strong>{{ ativo.quantidadeCotas }} cotas</strong></p>
+              <p>Preço Médio: <strong>R$ {{ ativo.precoMedio.toFixed(2).replace('.', ',') }}</strong></p>
+            </div>
+            
+            <div class="ativo-actions">
+              <button (click)="abrirDividendos(ativo)" class="btn-success">💰 Ver Dividendos</button>
+              <button (click)="prepararEdicao(ativo)" class="btn-warning">✏️ Editar</button>
+              <button (click)="removerAtivo(ativo.id)" class="btn-danger">🗑️ Excluir</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (ativoSelecionadoParaDividendo) {
+      <div>
+        <h2 style="color: var(--banco-blue);">Dividendos de {{ ativoSelecionadoParaDividendo.ticker }}</h2>
+        <button (click)="fecharDividendos()" class="btn-secondary" style="margin-bottom: 20px;">
+          ⬅ Voltar para a Carteira
+        </button>
+
+        <div class="form-container">
+          <h3 style="color: var(--banco-orange);">
+            {{ novoDividendo.id ? '✏️ Editando Recebimento' : 'Lançar Novo Recebimento' }}
+          </h3>
+          
+          <form (ngSubmit)="adicionarDividendo()">
+            <div class="form-group">
+              <label>Valor Recebido (R$): </label>
+              <input type="text" name="valorDiv" [(ngModel)]="novoDividendo.valor" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Data (Dia em que caiu na conta): </label>
+              <input type="date" name="dataDiv" [(ngModel)]="novoDividendo.dataPagamento" required>
+            </div>
+            
+            <div style="margin-top: 20px;">
+              <button type="submit" class="btn-primary">Salvar Dividendo</button>
+
+              @if (novoDividendo.id) {
+                <button type="button" (click)="limparFormularioDividendo()" class="btn-secondary" style="margin-left: 10px;">
+                  Cancelar Edição
+                </button>
+              }
+            </div>
+          </form>
+        </div>
+
+        <h3 style="color: var(--banco-blue);">Histórico de Pagamentos:</h3>
+        
+        <div>
+          @for (div of dividendos; track div.id) {
+            <div class="div-item">
+              <div>
+                <strong style="color: var(--success); font-size: 1.1em;">
+                  R$ {{ div.valor.toFixed(2).replace('.', ',') }}
+                </strong> 
+                <span style="color: var(--text-muted); margin-left: 10px;">recebido em {{ div.dataPagamento }}</span>
+              </div>
+              
+              <div style="display: flex; gap: 8px;">
+                <button (click)="prepararEdicaoDividendo(div)" class="btn-warning" style="padding: 6px 10px; font-size: 0.9em;">✏️</button>
+                <button (click)="removerDividendo(div.id)" class="btn-danger" style="padding: 6px 10px; font-size: 0.9em;">🗑️</button>
+              </div>
+            </div>
+          } @empty {
+            <p style="color: var(--text-muted);">Nenhum dividendo lançado para este ativo ainda.</p>
+          }
+        </div>
+      </div>
+    }
+  }
+</main>
