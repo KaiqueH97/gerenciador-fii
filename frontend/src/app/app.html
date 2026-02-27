@@ -21,12 +21,12 @@
       }
 
       <button (click)="fazerLogin()" [disabled]="isLoadingLogin" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s;" [style.opacity]="isLoadingLogin ? '0.7' : '1'">
-        {{ isLoadingLogin ? '⏳ Acordando Servidor...' : 'Entrar no Sistema' }}
+        {{ isLoadingLogin ? '⏳ Carregando' : 'Entrar no Sistema' }}
       </button>
       
       @if (isLoadingLogin) {
         <small style="display: block; margin-top: 15px; color: var(--text-muted);">
-          O primeiro acesso pode levar até 50 segundos para ligar o servidor na nuvem.
+          O primeiro acesso pode levar alguns segundos.
         </small>
       }
     </div>

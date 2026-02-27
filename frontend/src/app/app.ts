@@ -60,16 +60,20 @@ export class App implements OnInit {
     });
   }
 
-  sair(): void {
-    localStorage.removeItem('meuTokenDeAcesso');
-    this.isAutenticado = false;
-    this.ativos = [];
-    this.dividendos = [];
-    this.usuarioLogin = '';
-    this.senhaLogin = '';
-  }
+iniciarSistema(): void {
+    const ativosCache = localStorage.getItem('ativosCache');
+    if (ativosCache) {
+      this.ativos = JSON.parse(ativosCache); // Transforma o texto de volta em lista
+      this.calcularPatrimonio();
+      setTimeout(() => this.atualizarGrafico(), 1);
+    }
 
-  iniciarSistema(): void {
+    const dividendosCache = localStorage.getItem('dividendosCache');
+    if (dividendosCache) {
+      const dadosDiv = JSON.parse(dividendosCache);
+      this.totalDividendos = dadosDiv.reduce((soma: any, div: any) => soma + div.valor, 0);
+    }
+
     this.carregarAtivos();
     this.carregarTodosDividendos();
   }
@@ -77,6 +81,10 @@ export class App implements OnInit {
   carregarAtivos(): void {
     this.ativoService.listarAtivos().subscribe(dados => {
       this.ativos = dados;
+      
+      // Salva a versão mais nova e atualizada no cache do navegador
+      localStorage.setItem('ativosCache', JSON.stringify(dados));
+      
       this.calcularPatrimonio();
       setTimeout(() => this.atualizarGrafico(), 1); 
     });
@@ -84,8 +92,26 @@ export class App implements OnInit {
 
   carregarTodosDividendos(): void {
     this.ativoService.listarTodosDividendos().subscribe(dados => {
+      
+      // Salva a versão mais nova e atualizada no cache do navegador
+      localStorage.setItem('dividendosCache', JSON.stringify(dados));
+      
       this.totalDividendos = dados.reduce((soma, div) => soma + div.valor, 0);
     });
+  }
+
+  sair(): void {
+    localStorage.removeItem('meuTokenDeAcesso');
+    
+    // Por segurança, apagamos o cache financeiro quando o usuário faz logout
+    localStorage.removeItem('ativosCache');
+    localStorage.removeItem('dividendosCache');
+    
+    this.isAutenticado = false;
+    this.ativos = [];
+    this.dividendos = [];
+    this.usuarioLogin = '';
+    this.senhaLogin = '';
   }
 
   calcularPatrimonio(): void {
