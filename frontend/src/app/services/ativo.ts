@@ -20,8 +20,8 @@ export interface Dividendo {
   providedIn: 'root'
 })
 export class AtivoService {
-  public apiUrlAtivos = 'http://localhost:8080/api/ativos';
-  public apiUrlDividendos = 'http://localhost:8080/api/dividendos';
+  public apiUrlAtivos = 'https://gerenciador-fii.onrender.com/api/ativos';
+  public apiUrlDividendos = 'https://gerenciador-fii.onrender.com/api/dividendos';
 
   constructor(private http: HttpClient) { }
 
@@ -35,7 +35,7 @@ export class AtivoService {
     };
   }
 
-  // --- O TESTE DO LEÃO DE CHÁCARA ---
+  // --- O TESTE ---
   testarLogin(usuario: string, senha: string): Observable<any> {
     // btoa() é a função do JavaScript que embaralha a senha no formato Base64
     const token = btoa(usuario + ':' + senha); 
