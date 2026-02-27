@@ -9,15 +9,18 @@ import { Chart } from 'chart.js/auto';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css' 
 })
 export class App implements OnInit {
   
-  // NOSSAS NOVAS VARIÁVEIS DE SEGURANÇA
   isAutenticado: boolean = false;
   usuarioLogin: string = '';
   senhaLogin: string = '';
   erroLogin: boolean = false;
+
+  // NOVAS VARIÁVEIS DE CARREGAMENTO (UX)
+  isLoadingLogin: boolean = false;
+  isLoadingAcao: boolean = false;
 
   ativos: Ativo[] = [];
   dividendos: Dividendo[] = []; 
@@ -32,7 +35,6 @@ export class App implements OnInit {
   constructor(private ativoService: AtivoService) {}
 
   ngOnInit(): void {
-    // Quando você abre a tela, ele verifica se a sua senha já está salva no navegador
     const tokenSalvo = localStorage.getItem('meuTokenDeAcesso');
     if (tokenSalvo) {
       this.isAutenticado = true;
@@ -40,26 +42,25 @@ export class App implements OnInit {
     }
   }
 
-  // --- FUNÇÕES DE SEGURANÇA ---
   fazerLogin(): void {
+    this.isLoadingLogin = true; // Trava o botão e avisa que está carregando
     this.ativoService.testarLogin(this.usuarioLogin, this.senhaLogin).subscribe({
       next: () => {
-        // Deu certo! O Java deixou entrar. Salva a chave e libera a tela.
         const token = btoa(this.usuarioLogin + ':' + this.senhaLogin);
         localStorage.setItem('meuTokenDeAcesso', token);
         this.isAutenticado = true;
         this.erroLogin = false;
+        this.isLoadingLogin = false; // Libera o botão
         this.iniciarSistema();
       },
       error: () => {
-        // Errou a senha! O Java barrou.
         this.erroLogin = true;
+        this.isLoadingLogin = false; // Libera o botão
       }
     });
   }
 
   sair(): void {
-    // Rasga o crachá e tranca a tela
     localStorage.removeItem('meuTokenDeAcesso');
     this.isAutenticado = false;
     this.ativos = [];
@@ -73,7 +74,6 @@ export class App implements OnInit {
     this.carregarTodosDividendos();
   }
 
-  // --- O RESTO DO SISTEMA CONTINUA IGUAL! ---
   carregarAtivos(): void {
     this.ativoService.listarAtivos().subscribe(dados => {
       this.ativos = dados;
@@ -112,6 +112,8 @@ export class App implements OnInit {
       this.novoAtivo.precoMedio = valorInvestido / this.novoAtivo.quantidadeCotas;
     }
 
+    this.isLoadingAcao = true; // Trava o botão
+
     if (this.novoAtivo.id) {
       this.ativoService.atualizarAtivo(this.novoAtivo.id, this.novoAtivo).subscribe(ativoAtualizado => {
         const index = this.ativos.findIndex(a => a.id === ativoAtualizado.id);
@@ -119,6 +121,7 @@ export class App implements OnInit {
         this.calcularPatrimonio();
         setTimeout(() => this.atualizarGrafico(), 1);
         this.limparFormulario();
+        this.isLoadingAcao = false; // Libera o botão
       });
     } else {
       this.ativoService.salvarAtivo(this.novoAtivo).subscribe(ativoSalvo => {
@@ -126,6 +129,7 @@ export class App implements OnInit {
         this.calcularPatrimonio();
         setTimeout(() => this.atualizarGrafico(), 1);
         this.limparFormulario();
+        this.isLoadingAcao = false; // Libera o botão
       });
     }
   }
@@ -140,11 +144,13 @@ export class App implements OnInit {
     if (id) {
       const confirmar = confirm('Tem certeza que deseja apagar este ativo e TODOS os dividendos dele?');
       if (confirmar) {
+        this.isLoadingAcao = true; // Trava ações
         this.ativoService.excluirAtivo(id).subscribe(() => {
           this.ativos = this.ativos.filter(a => a.id !== id);
           this.calcularPatrimonio();
           this.carregarTodosDividendos(); 
           setTimeout(() => this.atualizarGrafico(), 1);
+          this.isLoadingAcao = false; // Libera ações
         });
       }
     }
@@ -167,13 +173,13 @@ export class App implements OnInit {
   fecharDividendos(): void {
     this.ativoSelecionadoParaDividendo = null; 
     this.dividendos = [];
-    // Redesenha o gráfico quando volta da tela de dividendos
     setTimeout(() => this.atualizarGrafico(), 1);
   }
 
   adicionarDividendo(): void {
     if (this.ativoSelecionadoParaDividendo?.id) {
       this.novoDividendo.valor = this.tratarMoeda(this.novoDividendo.valor);
+      this.isLoadingAcao = true; // Trava o botão
 
       if (this.novoDividendo.id) {
         this.ativoService.atualizarDividendo(this.ativoSelecionadoParaDividendo.id, this.novoDividendo)
@@ -182,6 +188,7 @@ export class App implements OnInit {
             if (index !== -1) this.dividendos[index] = divAtualizado;
             this.limparFormularioDividendo();
             this.carregarTodosDividendos(); 
+            this.isLoadingAcao = false; // Libera o botão
           });
       } else {
         this.ativoService.salvarDividendo(this.ativoSelecionadoParaDividendo.id, this.novoDividendo)
@@ -189,6 +196,7 @@ export class App implements OnInit {
             this.dividendos.push(divSalvo); 
             this.limparFormularioDividendo();
             this.carregarTodosDividendos(); 
+            this.isLoadingAcao = false; // Libera o botão
           });
       }
     }
@@ -202,9 +210,11 @@ export class App implements OnInit {
 
   removerDividendo(id: number | undefined): void {
     if (id) {
+      this.isLoadingAcao = true; // Trava botões
       this.ativoService.excluirDividendo(id).subscribe(() => {
         this.dividendos = this.dividendos.filter(div => div.id !== id);
         this.carregarTodosDividendos(); 
+        this.isLoadingAcao = false; // Libera botões
       });
     }
   }

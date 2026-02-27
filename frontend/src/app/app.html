@@ -6,12 +6,12 @@
       
       <div class="form-group" style="text-align: left;">
         <label>Usuário:</label>
-        <input type="text" [(ngModel)]="usuarioLogin" placeholder="Digite seu usuário" (keyup.enter)="fazerLogin()">
+        <input type="text" [(ngModel)]="usuarioLogin" placeholder="Digite seu usuário" (keyup.enter)="fazerLogin()" [disabled]="isLoadingLogin">
       </div>
       
       <div class="form-group" style="text-align: left; margin-bottom: 25px;">
         <label>Senha:</label>
-        <input type="password" [(ngModel)]="senhaLogin" placeholder="Digite sua senha" (keyup.enter)="fazerLogin()">
+        <input type="password" [(ngModel)]="senhaLogin" placeholder="Digite sua senha" (keyup.enter)="fazerLogin()" [disabled]="isLoadingLogin">
       </div>
 
       @if (erroLogin) {
@@ -20,7 +20,15 @@
         </div>
       }
 
-      <button (click)="fazerLogin()" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px;">Entrar no Sistema</button>
+      <button (click)="fazerLogin()" [disabled]="isLoadingLogin" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s;" [style.opacity]="isLoadingLogin ? '0.7' : '1'">
+        {{ isLoadingLogin ? '⏳ Acordando Servidor...' : 'Entrar no Sistema' }}
+      </button>
+      
+      @if (isLoadingLogin) {
+        <small style="display: block; margin-top: 15px; color: var(--text-muted);">
+          O primeiro acesso pode levar até 50 segundos para ligar o servidor na nuvem.
+        </small>
+      }
     </div>
   }
 
@@ -58,12 +66,12 @@
         <form (ngSubmit)="adicionarAtivo()">
           <div class="form-group">
             <label>Ticker (Ex: MXRF11): </label>
-            <input type="text" name="ticker" [(ngModel)]="novoAtivo.ticker" required>
+            <input type="text" name="ticker" [(ngModel)]="novoAtivo.ticker" required [disabled]="isLoadingAcao">
           </div>
           
           <div class="form-group">
             <label>Tipo: </label>
-            <select name="tipo" [(ngModel)]="novoAtivo.tipo">
+            <select name="tipo" [(ngModel)]="novoAtivo.tipo" [disabled]="isLoadingAcao">
               <option value="FII">FII</option>
               <option value="ACAO">AÇÃO</option>
               <option value="RENDA_FIXA">RENDA FIXA</option>
@@ -72,12 +80,12 @@
           
           <div class="form-group">
             <label>Quantidade de Cotas: </label>
-            <input type="number" name="quantidade" [(ngModel)]="novoAtivo.quantidadeCotas" required>
+            <input type="number" name="quantidade" [(ngModel)]="novoAtivo.quantidadeCotas" required [disabled]="isLoadingAcao">
           </div>
           
           <div class="form-group">
             <label>Valor Total Investido (R$): </label>
-            <input type="text" name="valorTotal" [(ngModel)]="valorTotalInvestido" required>
+            <input type="text" name="valorTotal" [(ngModel)]="valorTotalInvestido" required [disabled]="isLoadingAcao">
             
             @if (novoAtivo.quantidadeCotas > 0 && valorTotalInvestido) {
               <small style="color: var(--success); font-weight: bold; display: block; margin-top: 5px;">
@@ -87,10 +95,12 @@
           </div>
           
           <div style="margin-top: 20px;">
-            <button type="submit" class="btn-primary">Salvar Ativo</button>
+            <button type="submit" [disabled]="isLoadingAcao" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
+              {{ isLoadingAcao ? '⏳ Salvando...' : 'Salvar Ativo' }}
+            </button>
             
             @if (novoAtivo.id) {
-              <button type="button" (click)="limparFormulario()" class="btn-secondary" style="margin-left: 10px;">
+              <button type="button" (click)="limparFormulario()" class="btn-secondary" style="margin-left: 10px;" [disabled]="isLoadingAcao">
                 Cancelar Edição
               </button>
             }
@@ -114,9 +124,11 @@
             </div>
             
             <div class="ativo-actions">
-              <button (click)="abrirDividendos(ativo)" class="btn-success">💰 Ver Dividendos</button>
-              <button (click)="prepararEdicao(ativo)" class="btn-warning">✏️ Editar</button>
-              <button (click)="removerAtivo(ativo.id)" class="btn-danger">🗑️ Excluir</button>
+              <button (click)="abrirDividendos(ativo)" class="btn-success" [disabled]="isLoadingAcao">💰 Ver Dividendos</button>
+              <button (click)="prepararEdicao(ativo)" class="btn-warning" [disabled]="isLoadingAcao">✏️ Editar</button>
+              <button (click)="removerAtivo(ativo.id)" class="btn-danger" [disabled]="isLoadingAcao">
+                {{ isLoadingAcao ? '⏳' : '🗑️ Excluir' }}
+              </button>
             </div>
           </div>
         }
@@ -126,7 +138,7 @@
     @if (ativoSelecionadoParaDividendo) {
       <div>
         <h2 style="color: var(--banco-blue);">Dividendos de {{ ativoSelecionadoParaDividendo.ticker }}</h2>
-        <button (click)="fecharDividendos()" class="btn-secondary" style="margin-bottom: 20px;">
+        <button (click)="fecharDividendos()" class="btn-secondary" style="margin-bottom: 20px;" [disabled]="isLoadingAcao">
           ⬅ Voltar para a Carteira
         </button>
 
@@ -138,19 +150,21 @@
           <form (ngSubmit)="adicionarDividendo()">
             <div class="form-group">
               <label>Valor Recebido (R$): </label>
-              <input type="text" name="valorDiv" [(ngModel)]="novoDividendo.valor" required>
+              <input type="text" name="valorDiv" [(ngModel)]="novoDividendo.valor" required [disabled]="isLoadingAcao">
             </div>
             
             <div class="form-group">
               <label>Data (Dia em que caiu na conta): </label>
-              <input type="date" name="dataDiv" [(ngModel)]="novoDividendo.dataPagamento" required>
+              <input type="date" name="dataDiv" [(ngModel)]="novoDividendo.dataPagamento" required [disabled]="isLoadingAcao">
             </div>
             
             <div style="margin-top: 20px;">
-              <button type="submit" class="btn-primary">Salvar Dividendo</button>
+              <button type="submit" [disabled]="isLoadingAcao" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
+                {{ isLoadingAcao ? '⏳ Salvando...' : 'Salvar Dividendo' }}
+              </button>
 
               @if (novoDividendo.id) {
-                <button type="button" (click)="limparFormularioDividendo()" class="btn-secondary" style="margin-left: 10px;">
+                <button type="button" (click)="limparFormularioDividendo()" class="btn-secondary" style="margin-left: 10px;" [disabled]="isLoadingAcao">
                   Cancelar Edição
                 </button>
               }
@@ -171,8 +185,8 @@
               </div>
               
               <div style="display: flex; gap: 8px;">
-                <button (click)="prepararEdicaoDividendo(div)" class="btn-warning" style="padding: 6px 10px; font-size: 0.9em;">✏️</button>
-                <button (click)="removerDividendo(div.id)" class="btn-danger" style="padding: 6px 10px; font-size: 0.9em;">🗑️</button>
+                <button (click)="prepararEdicaoDividendo(div)" class="btn-warning" style="padding: 6px 10px; font-size: 0.9em;" [disabled]="isLoadingAcao">✏️</button>
+                <button (click)="removerDividendo(div.id)" class="btn-danger" style="padding: 6px 10px; font-size: 0.9em;" [disabled]="isLoadingAcao">🗑️</button>
               </div>
             </div>
           } @empty {
