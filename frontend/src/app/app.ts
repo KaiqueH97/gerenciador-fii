@@ -135,7 +135,9 @@ iniciarSistema(): void {
   getPrecoMedioCalculado(): string {
     if (this.novoAtivo.quantidadeCotas > 0 && this.valorTotalInvestido) {
       let valor = this.tratarMoeda(this.valorTotalInvestido);
-      if (valor > 0) return (valor / this.novoAtivo.quantidadeCotas).toFixed(2).replace('.', ',');
+      if (valor > 0) {
+        return this.formatarMoedaBR(valor / this.novoAtivo.quantidadeCotas);
+      }
     }
     return '0,00';
   }
@@ -319,6 +321,15 @@ iniciarSistema(): void {
         }]
       },
       options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  // padrão brasileiro
+  formatarMoedaBR(valor: number): string {
+    if (!valor) return '0,00';
+    return valor.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     });
   }
 }

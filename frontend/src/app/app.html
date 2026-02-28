@@ -41,12 +41,12 @@
     <div class="dashboard">
       <div class="dash-card">
         <h3>Patrimônio Total</h3>
-        <h1>R$ {{ totalPatrimonio.toFixed(2).replace('.', ',') }}</h1>
+        <h1>R$ {{ formatarMoedaBR(totalPatrimonio) }}</h1>
       </div>
 
       <div class="dash-card">
         <h3>Dividendos Recebidos</h3>
-        <h1>R$ {{ totalDividendos.toFixed(2).replace('.', ',') }}</h1>
+        <h1>R$ {{ formatarMoedaBR(totalDividendos) }}</h1>
       </div>
     </div>
 
@@ -120,7 +120,7 @@
             
             <div class="ativo-body">
               <p>Quantidade: <strong>{{ ativo.quantidadeCotas }} cotas</strong></p>
-              <p>Preço Médio: <strong>R$ {{ ativo.precoMedio.toFixed(2).replace('.', ',') }}</strong></p>
+              <p>Preço Médio: <strong>R$ {{ formatarMoedaBR(ativo.precoMedio) }}</strong></p>
             </div>
             
             <div class="ativo-actions">
@@ -179,7 +179,7 @@
             <div class="div-item">
               <div>
                 <strong style="color: var(--success); font-size: 1.1em;">
-                  R$ {{ div.valor.toFixed(2).replace('.', ',') }}
+                  R$ {{ formatarMoedaBR(div.valor) }}
                 </strong> 
                 <span style="color: var(--text-muted); margin-left: 10px;">recebido em {{ div.dataPagamento }}</span>
               </div>
