@@ -2,32 +2,49 @@
   
   @if (!isAutenticado) {
     <div style="max-width: 400px; margin: 100px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid var(--banco-orange);">
-      <h2 style="color: var(--banco-blue); margin-bottom: 20px;">Acesso ao Gerenciador</h2>
+      
+      <h2 style="color: var(--banco-blue); margin-bottom: 20px;">
+        {{ modoCadastro ? 'Criar Nova Conta' : 'Acesso ao Gerenciador' }}
+      </h2>
       
       <div class="form-group" style="text-align: left;">
         <label>Usuário:</label>
-        <input type="text" [(ngModel)]="usuarioLogin" placeholder="Digite seu usuário" (keyup.enter)="fazerLogin()" [disabled]="isLoadingLogin">
+        <input type="text" [(ngModel)]="usuarioLogin" placeholder="Digite seu usuário" [disabled]="isLoadingLogin || isLoadingCadastro">
       </div>
       
       <div class="form-group" style="text-align: left; margin-bottom: 25px;">
         <label>Senha:</label>
-        <input type="password" [(ngModel)]="senhaLogin" placeholder="Digite sua senha" (keyup.enter)="fazerLogin()" [disabled]="isLoadingLogin">
+        <input type="password" [(ngModel)]="senhaLogin" placeholder="Digite sua senha" (keyup.enter)="modoCadastro ? cadastrarUsuario() : fazerLogin()" [disabled]="isLoadingLogin || isLoadingCadastro">
       </div>
 
-      @if (erroLogin) {
+      @if (erroLogin && !modoCadastro) {
         <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-weight: bold;">
-          Usuário ou senha incorretos!
+          Usuário não encontrado ou senha incorreta!
         </div>
       }
 
-      <button (click)="fazerLogin()" [disabled]="isLoadingLogin" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s;" [style.opacity]="isLoadingLogin ? '0.7' : '1'">
-        {{ isLoadingLogin ? '⏳ Carregando' : 'Entrar no Sistema' }}
-      </button>
-      
-      @if (isLoadingLogin) {
-        <small style="display: block; margin-top: 15px; color: var(--text-muted);">
-          O primeiro acesso pode levar alguns segundos.
-        </small>
+      @if (mensagemCadastro) {
+        <div style="padding: 10px; border-radius: 6px; margin-bottom: 15px; font-weight: bold;" 
+             [ngStyle]="{'background': mensagemCadastro.includes('✅') ? '#d4edda' : '#f8d7da', 'color': mensagemCadastro.includes('✅') ? '#155724' : '#721c24'}">
+          {{ mensagemCadastro }}
+        </div>
+      }
+
+      @if (!modoCadastro) {
+        <button (click)="fazerLogin()" [disabled]="isLoadingLogin" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingLogin ? '0.7' : '1'">
+          {{ isLoadingLogin ? '⏳ Conectando...' : 'Entrar no Sistema' }}
+        </button>
+        <p style="margin: 0; color: var(--text-muted);">Não tem uma conta?</p>
+        <button (click)="alternarModoLogin()" class="btn-secondary" style="width: 100%; margin-top: 5px;">
+          Criar uma conta
+        </button>
+      } @else {
+        <button (click)="cadastrarUsuario()" [disabled]="isLoadingCadastro" class="btn-success" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingCadastro ? '0.7' : '1'">
+          {{ isLoadingCadastro ? '⏳ Criando...' : 'Finalizar Cadastro' }}
+        </button>
+        <button (click)="alternarModoLogin()" class="btn-secondary" style="width: 100%;" [disabled]="isLoadingCadastro">
+          Voltar para o Login
+        </button>
       }
     </div>
   }

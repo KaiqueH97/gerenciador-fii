@@ -17,6 +17,9 @@ export class App implements OnInit {
   usuarioLogin: string = '';
   senhaLogin: string = '';
   erroLogin: boolean = false;
+  modoCadastro: boolean = false;
+  isLoadingCadastro: boolean = false;
+  mensagemCadastro: string = '';
 
   // NOVAS VARIÁVEIS DE CARREGAMENTO (UX)
   isLoadingLogin: boolean = false;
@@ -330,6 +333,43 @@ iniciarSistema(): void {
     return valor.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
+    });
+  }
+
+  alternarModoLogin(): void {
+    this.modoCadastro = !this.modoCadastro;
+    this.erroLogin = false;
+    this.mensagemCadastro = '';
+    this.usuarioLogin = '';
+    this.senhaLogin = '';
+  }
+
+  cadastrarUsuario(): void {
+    if (!this.usuarioLogin || !this.senhaLogin) {
+      this.mensagemCadastro = 'Preencha usuário e senha!';
+      return;
+    }
+
+    this.isLoadingCadastro = true;
+    this.mensagemCadastro = '';
+
+    this.ativoService.registrarUsuario(this.usuarioLogin, this.senhaLogin).subscribe({
+      next: (resposta) => {
+        this.mensagemCadastro = '✅ Conta criada com sucesso! Você já pode fazer login.';
+        this.isLoadingCadastro = false;
+        // Limpa a senha, mas deixa o usuário preenchido para facilitar o login
+        this.senhaLogin = ''; 
+        
+        // Volta para a tela de login depois de 2 segundos
+        setTimeout(() => {
+          this.modoCadastro = false;
+          this.mensagemCadastro = '';
+        }, 2500);
+      },
+      error: (erro) => {
+        this.mensagemCadastro = '❌ Erro: Este usuário já existe ou o servidor falhou.';
+        this.isLoadingCadastro = false;
+      }
     });
   }
 }

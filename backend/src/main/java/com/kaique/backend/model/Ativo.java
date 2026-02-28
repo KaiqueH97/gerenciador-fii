@@ -16,7 +16,7 @@ public class Ativo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String ticker; // Ex: MXRF11, ITSA4
 
     @Column(nullable = false)
@@ -25,4 +25,9 @@ public class Ativo {
     private Integer quantidadeCotas;
 
     private Double precoMedio;
+
+    // Relacionamento: VÁRIOS ativos pertencem a UM usuário
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 }

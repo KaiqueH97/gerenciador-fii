@@ -82,4 +82,12 @@ export class AtivoService {
   excluirDividendo(dividendoId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrlDividendos}/${dividendoId}`, this.getHeaders());
   }
+
+registrarUsuario(usuario: string, senha: string): Observable<any> {
+    // Usando o link base do seu Render diretamente
+    const url = 'https://gerenciador-fii.onrender.com/api/auth/register';
+    
+    // O responseType: 'text' é super importante porque o nosso Java devolve um texto "Usuário criado" e não um JSON!
+    return this.http.post(url, { username: usuario, password: senha }, { responseType: 'text' });
+  }
 }
