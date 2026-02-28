@@ -9,12 +9,12 @@
       
       <div class="form-group" style="text-align: left;">
         <label>Usuário:</label>
-        <input type="text" [(ngModel)]="usuarioLogin" placeholder="Digite seu usuário" [disabled]="isLoadingLogin || isLoadingCadastro">
+        <input type="text" [(ngModel)]="usuarioLogin" placeholder="Digite seu usuário">
       </div>
       
       <div class="form-group" style="text-align: left; margin-bottom: 25px;">
         <label>Senha:</label>
-        <input type="password" [(ngModel)]="senhaLogin" placeholder="Digite sua senha" (keyup.enter)="modoCadastro ? cadastrarUsuario() : fazerLogin()" [disabled]="isLoadingLogin || isLoadingCadastro">
+        <input type="password" [(ngModel)]="senhaLogin" placeholder="Digite sua senha" (keyup.enter)="modoCadastro ? cadastrarUsuario() : fazerLogin()">
       </div>
 
       @if (erroLogin && !modoCadastro) {
@@ -31,7 +31,7 @@
       }
 
       @if (!modoCadastro) {
-        <button (click)="fazerLogin()" [disabled]="isLoadingLogin" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingLogin ? '0.7' : '1'">
+        <button (click)="fazerLogin()" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingLogin ? '0.7' : '1'">
           {{ isLoadingLogin ? '⏳ Conectando...' : 'Entrar no Sistema' }}
         </button>
         <p style="margin: 0; color: var(--text-muted);">Não tem uma conta?</p>
@@ -39,10 +39,10 @@
           Criar uma conta
         </button>
       } @else {
-        <button (click)="cadastrarUsuario()" [disabled]="isLoadingCadastro" class="btn-success" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingCadastro ? '0.7' : '1'">
+        <button (click)="cadastrarUsuario()" class="btn-success" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingCadastro ? '0.7' : '1'">
           {{ isLoadingCadastro ? '⏳ Criando...' : 'Finalizar Cadastro' }}
         </button>
-        <button (click)="alternarModoLogin()" class="btn-secondary" style="width: 100%;" [disabled]="isLoadingCadastro">
+        <button (click)="alternarModoLogin()" class="btn-secondary" style="width: 100%;" >
           Voltar para o Login
         </button>
       }
@@ -83,12 +83,12 @@
         <form (ngSubmit)="adicionarAtivo()">
           <div class="form-group">
             <label>Ticker (Ex: MXRF11): </label>
-            <input type="text" name="ticker" [(ngModel)]="novoAtivo.ticker" required [disabled]="isLoadingAcao">
+            <input type="text" name="ticker" [(ngModel)]="novoAtivo.ticker" required >
           </div>
           
           <div class="form-group">
             <label>Tipo: </label>
-            <select name="tipo" [(ngModel)]="novoAtivo.tipo" [disabled]="isLoadingAcao">
+            <select name="tipo" [(ngModel)]="novoAtivo.tipo" >
               <option value="FII">FII</option>
               <option value="ACAO">AÇÃO</option>
               <option value="RENDA_FIXA">RENDA FIXA</option>
@@ -97,12 +97,12 @@
           
           <div class="form-group">
             <label>Quantidade de Cotas: </label>
-            <input type="number" name="quantidade" [(ngModel)]="novoAtivo.quantidadeCotas" required [disabled]="isLoadingAcao">
+            <input type="number" name="quantidade" [(ngModel)]="novoAtivo.quantidadeCotas" required >
           </div>
           
           <div class="form-group">
             <label>Valor Total Investido (R$): </label>
-            <input type="text" name="valorTotal" [(ngModel)]="valorTotalInvestido" required [disabled]="isLoadingAcao">
+            <input type="text" name="valorTotal" [(ngModel)]="valorTotalInvestido" required >
             
             @if (novoAtivo.quantidadeCotas > 0 && valorTotalInvestido) {
               <small style="color: var(--success); font-weight: bold; display: block; margin-top: 5px;">
@@ -112,12 +112,12 @@
           </div>
           
           <div style="margin-top: 20px;">
-            <button type="submit" [disabled]="isLoadingAcao" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
+            <button type="submit" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
               {{ isLoadingAcao ? '⏳ Salvando...' : 'Salvar Ativo' }}
             </button>
             
             @if (novoAtivo.id) {
-              <button type="button" (click)="limparFormulario()" class="btn-secondary" style="margin-left: 10px;" [disabled]="isLoadingAcao">
+              <button type="button" (click)="limparFormulario()" class="btn-secondary" style="margin-left: 10px;" >
                 Cancelar Edição
               </button>
             }
@@ -141,9 +141,9 @@
             </div>
             
             <div class="ativo-actions">
-              <button (click)="abrirDividendos(ativo)" class="btn-success" [disabled]="isLoadingAcao">💰 Ver Dividendos</button>
-              <button (click)="prepararEdicao(ativo)" class="btn-warning" [disabled]="isLoadingAcao">✏️ Editar</button>
-              <button (click)="removerAtivo(ativo.id)" class="btn-danger" [disabled]="isLoadingAcao">
+              <button (click)="abrirDividendos(ativo)" class="btn-success" >💰 Ver Dividendos</button>
+              <button (click)="prepararEdicao(ativo)" class="btn-warning" >✏️ Editar</button>
+              <button (click)="removerAtivo(ativo.id)" class="btn-danger" >
                 {{ isLoadingAcao ? '⏳' : '🗑️ Excluir' }}
               </button>
             </div>
@@ -155,7 +155,7 @@
     @if (ativoSelecionadoParaDividendo) {
       <div>
         <h2 style="color: var(--banco-blue);">Dividendos de {{ ativoSelecionadoParaDividendo.ticker }}</h2>
-        <button (click)="fecharDividendos()" class="btn-secondary" style="margin-bottom: 20px;" [disabled]="isLoadingAcao">
+        <button (click)="fecharDividendos()" class="btn-secondary" style="margin-bottom: 20px;" >
           ⬅ Voltar para a Carteira
         </button>
 
@@ -167,21 +167,21 @@
           <form (ngSubmit)="adicionarDividendo()">
             <div class="form-group">
               <label>Valor Recebido (R$): </label>
-              <input type="text" name="valorDiv" [(ngModel)]="novoDividendo.valor" required [disabled]="isLoadingAcao">
+              <input type="text" name="valorDiv" [(ngModel)]="novoDividendo.valor" required >
             </div>
             
             <div class="form-group">
               <label>Data (Dia em que caiu na conta): </label>
-              <input type="date" name="dataDiv" [(ngModel)]="novoDividendo.dataPagamento" required [disabled]="isLoadingAcao">
+              <input type="date" name="dataDiv" [(ngModel)]="novoDividendo.dataPagamento" required>
             </div>
             
             <div style="margin-top: 20px;">
-              <button type="submit" [disabled]="isLoadingAcao" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
+              <button type="submit" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
                 {{ isLoadingAcao ? '⏳ Salvando...' : 'Salvar Dividendo' }}
               </button>
 
               @if (novoDividendo.id) {
-                <button type="button" (click)="limparFormularioDividendo()" class="btn-secondary" style="margin-left: 10px;" [disabled]="isLoadingAcao">
+                <button type="button" (click)="limparFormularioDividendo()" class="btn-secondary" style="margin-left: 10px;" >
                   Cancelar Edição
                 </button>
               }
@@ -202,8 +202,8 @@
               </div>
               
               <div style="display: flex; gap: 8px;">
-                <button (click)="prepararEdicaoDividendo(div)" class="btn-warning" style="padding: 6px 10px; font-size: 0.9em;" [disabled]="isLoadingAcao">✏️</button>
-                <button (click)="removerDividendo(div.id)" class="btn-danger" style="padding: 6px 10px; font-size: 0.9em;" [disabled]="isLoadingAcao">🗑️</button>
+                <button (click)="prepararEdicaoDividendo(div)" class="btn-warning" style="padding: 6px 10px; font-size: 0.9em;" >✏️</button>
+                <button (click)="removerDividendo(div.id)" class="btn-danger" style="padding: 6px 10px; font-size: 0.9em;" >🗑️</button>
               </div>
             </div>
           } @empty {
