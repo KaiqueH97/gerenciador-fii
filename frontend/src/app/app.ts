@@ -42,20 +42,28 @@ export class App implements OnInit {
     }
   }
 
-  fazerLogin(): void {
-    this.isLoadingLogin = true; // Trava o botão e avisa que está carregando
+fazerLogin(): void {
+    this.isLoadingLogin = true; 
+    
     this.ativoService.testarLogin(this.usuarioLogin, this.senhaLogin).subscribe({
       next: () => {
         const token = btoa(this.usuarioLogin + ':' + this.senhaLogin);
         localStorage.setItem('meuTokenDeAcesso', token);
         this.isAutenticado = true;
         this.erroLogin = false;
-        this.isLoadingLogin = false; // Libera o botão
+        this.isLoadingLogin = false; 
         this.iniciarSistema();
       },
-      error: () => {
-        this.erroLogin = true;
-        this.isLoadingLogin = false; // Libera o botão
+      error: (erro) => {
+        this.isLoadingLogin = false; // Sempre libera o botão se der erro!
+        
+        // Se o erro for 500 (Banco dormindo) ou 0 (Render dormindo)
+        if (erro.status === 500 || erro.status === 0 || erro.status === 503) {
+          alert('O servidor e o banco de dados estão acordando do modo de economia de energia. Por favor, aguarde 15 segundos e clique em Entrar novamente!');
+        } else {
+          // Se for erro 401, a senha está errada mesmo
+          this.erroLogin = true;
+        }
       }
     });
   }
@@ -141,21 +149,35 @@ iniciarSistema(): void {
     this.isLoadingAcao = true; // Trava o botão
 
     if (this.novoAtivo.id) {
-      this.ativoService.atualizarAtivo(this.novoAtivo.id, this.novoAtivo).subscribe(ativoAtualizado => {
-        const index = this.ativos.findIndex(a => a.id === ativoAtualizado.id);
-        if (index !== -1) this.ativos[index] = ativoAtualizado;
-        this.calcularPatrimonio();
-        setTimeout(() => this.atualizarGrafico(), 1);
-        this.limparFormulario();
-        this.isLoadingAcao = false; // Libera o botão
+      this.ativoService.atualizarAtivo(this.novoAtivo.id, this.novoAtivo).subscribe({
+        next: (ativoAtualizado) => {
+          const index = this.ativos.findIndex(a => a.id === ativoAtualizado.id);
+          if (index !== -1) this.ativos[index] = ativoAtualizado;
+          this.calcularPatrimonio();
+          setTimeout(() => this.atualizarGrafico(), 1);
+          this.limparFormulario();
+          this.isLoadingAcao = false; // Libera o botão
+        },
+        error: (erro) => {
+          console.error(erro);
+          alert('Erro ao salvar. O servidor pode estar acordando, aguarde uns segundos e tente novamente.');
+          this.isLoadingAcao = false; // LIBERA O BOTÃO MESMO COM ERRO!
+        }
       });
     } else {
-      this.ativoService.salvarAtivo(this.novoAtivo).subscribe(ativoSalvo => {
-        this.ativos.push(ativoSalvo);
-        this.calcularPatrimonio();
-        setTimeout(() => this.atualizarGrafico(), 1);
-        this.limparFormulario();
-        this.isLoadingAcao = false; // Libera o botão
+      this.ativoService.salvarAtivo(this.novoAtivo).subscribe({
+        next: (ativoSalvo) => {
+          this.ativos.push(ativoSalvo);
+          this.calcularPatrimonio();
+          setTimeout(() => this.atualizarGrafico(), 1);
+          this.limparFormulario();
+          this.isLoadingAcao = false; // Libera o botão
+        },
+        error: (erro) => {
+          console.error(erro);
+          alert('Erro ao salvar. O servidor pode estar acordando, aguarde uns segundos e tente novamente.');
+          this.isLoadingAcao = false; // LIBERA O BOTÃO MESMO COM ERRO!
+        }
       });
     }
   }
@@ -170,13 +192,19 @@ iniciarSistema(): void {
     if (id) {
       const confirmar = confirm('Tem certeza que deseja apagar este ativo e TODOS os dividendos dele?');
       if (confirmar) {
-        this.isLoadingAcao = true; // Trava ações
-        this.ativoService.excluirAtivo(id).subscribe(() => {
-          this.ativos = this.ativos.filter(a => a.id !== id);
-          this.calcularPatrimonio();
-          this.carregarTodosDividendos(); 
-          setTimeout(() => this.atualizarGrafico(), 1);
-          this.isLoadingAcao = false; // Libera ações
+        this.isLoadingAcao = true; 
+        this.ativoService.excluirAtivo(id).subscribe({
+          next: () => {
+            this.ativos = this.ativos.filter(a => a.id !== id);
+            this.calcularPatrimonio();
+            this.carregarTodosDividendos(); 
+            setTimeout(() => this.atualizarGrafico(), 1);
+            this.isLoadingAcao = false;
+          },
+          error: (erro) => {
+            alert('Erro ao excluir. Tente novamente.');
+            this.isLoadingAcao = false; // LIBERA O BOTÃO
+          }
         });
       }
     }
@@ -205,25 +233,35 @@ iniciarSistema(): void {
   adicionarDividendo(): void {
     if (this.ativoSelecionadoParaDividendo?.id) {
       this.novoDividendo.valor = this.tratarMoeda(this.novoDividendo.valor);
-      this.isLoadingAcao = true; // Trava o botão
+      this.isLoadingAcao = true;
 
       if (this.novoDividendo.id) {
-        this.ativoService.atualizarDividendo(this.ativoSelecionadoParaDividendo.id, this.novoDividendo)
-          .subscribe(divAtualizado => {
+        this.ativoService.atualizarDividendo(this.ativoSelecionadoParaDividendo.id, this.novoDividendo).subscribe({
+          next: (divAtualizado) => {
             const index = this.dividendos.findIndex(d => d.id === divAtualizado.id);
             if (index !== -1) this.dividendos[index] = divAtualizado;
             this.limparFormularioDividendo();
             this.carregarTodosDividendos(); 
-            this.isLoadingAcao = false; // Libera o botão
-          });
+            this.isLoadingAcao = false;
+          },
+          error: (erro) => {
+            alert('Erro ao salvar dividendo. Tente novamente.');
+            this.isLoadingAcao = false; // LIBERA O BOTÃO
+          }
+        });
       } else {
-        this.ativoService.salvarDividendo(this.ativoSelecionadoParaDividendo.id, this.novoDividendo)
-          .subscribe(divSalvo => {
+        this.ativoService.salvarDividendo(this.ativoSelecionadoParaDividendo.id, this.novoDividendo).subscribe({
+          next: (divSalvo) => {
             this.dividendos.push(divSalvo); 
             this.limparFormularioDividendo();
             this.carregarTodosDividendos(); 
-            this.isLoadingAcao = false; // Libera o botão
-          });
+            this.isLoadingAcao = false;
+          },
+          error: (erro) => {
+            alert('Erro ao salvar dividendo. Tente novamente.');
+            this.isLoadingAcao = false; // LIBERA O BOTÃO
+          }
+        });
       }
     }
   }
@@ -236,11 +274,17 @@ iniciarSistema(): void {
 
   removerDividendo(id: number | undefined): void {
     if (id) {
-      this.isLoadingAcao = true; // Trava botões
-      this.ativoService.excluirDividendo(id).subscribe(() => {
-        this.dividendos = this.dividendos.filter(div => div.id !== id);
-        this.carregarTodosDividendos(); 
-        this.isLoadingAcao = false; // Libera botões
+      this.isLoadingAcao = true;
+      this.ativoService.excluirDividendo(id).subscribe({
+        next: () => {
+          this.dividendos = this.dividendos.filter(div => div.id !== id);
+          this.carregarTodosDividendos(); 
+          this.isLoadingAcao = false;
+        },
+        error: (erro) => {
+          alert('Erro ao excluir dividendo. Tente novamente.');
+          this.isLoadingAcao = false; // LIBERA O BOTÃO
+        }
       });
     }
   }
