@@ -18,12 +18,7 @@ export class App implements OnInit {
   senhaLogin: string = '';
   erroLogin: boolean = false;
   modoCadastro: boolean = false;
-  isLoadingCadastro: boolean = false;
   mensagemCadastro: string = '';
-
-  // NOVAS VARIÁVEIS DE CARREGAMENTO (UX)
-  isLoadingLogin: boolean = false;
-  isLoadingAcao: boolean = false;
 
   ativos: Ativo[] = [];
   dividendos: Dividendo[] = []; 
@@ -45,36 +40,25 @@ export class App implements OnInit {
     }
   }
 
-fazerLogin(): void {
-    this.isLoadingLogin = true; 
-    
+  fazerLogin(): void {
     this.ativoService.testarLogin(this.usuarioLogin, this.senhaLogin).subscribe({
       next: () => {
         const token = btoa(this.usuarioLogin + ':' + this.senhaLogin);
         localStorage.setItem('meuTokenDeAcesso', token);
         this.isAutenticado = true;
         this.erroLogin = false;
-        this.isLoadingLogin = false; 
         this.iniciarSistema();
       },
       error: (erro) => {
-        this.isLoadingLogin = false; // Sempre libera o botão se der erro!
-        
-        // Se o erro for 500 (Banco dormindo) ou 0 (Render dormindo)
-        if (erro.status === 500 || erro.status === 0 || erro.status === 503) {
-          alert('O servidor e o banco de dados estão acordando do modo de economia de energia. Por favor, aguarde 15 segundos e clique em Entrar novamente!');
-        } else {
-          // Se for erro 401, a senha está errada mesmo
-          this.erroLogin = true;
-        }
+        this.erroLogin = true;
       }
     });
   }
 
-iniciarSistema(): void {
+  iniciarSistema(): void {
     const ativosCache = localStorage.getItem('ativosCache');
     if (ativosCache) {
-      this.ativos = JSON.parse(ativosCache); // Transforma o texto de volta em lista
+      this.ativos = JSON.parse(ativosCache); 
       this.calcularPatrimonio();
       setTimeout(() => this.atualizarGrafico(), 1);
     }
@@ -92,10 +76,7 @@ iniciarSistema(): void {
   carregarAtivos(): void {
     this.ativoService.listarAtivos().subscribe(dados => {
       this.ativos = dados;
-      
-      // Salva a versão mais nova e atualizada no cache do navegador
       localStorage.setItem('ativosCache', JSON.stringify(dados));
-      
       this.calcularPatrimonio();
       setTimeout(() => this.atualizarGrafico(), 1); 
     });
@@ -103,18 +84,13 @@ iniciarSistema(): void {
 
   carregarTodosDividendos(): void {
     this.ativoService.listarTodosDividendos().subscribe(dados => {
-      
-      // Salva a versão mais nova e atualizada no cache do navegador
       localStorage.setItem('dividendosCache', JSON.stringify(dados));
-      
       this.totalDividendos = dados.reduce((soma, div) => soma + div.valor, 0);
     });
   }
 
   sair(): void {
     localStorage.removeItem('meuTokenDeAcesso');
-    
-    // Por segurança, apagamos o cache financeiro quando o usuário faz logout
     localStorage.removeItem('ativosCache');
     localStorage.removeItem('dividendosCache');
     
@@ -151,8 +127,6 @@ iniciarSistema(): void {
       this.novoAtivo.precoMedio = valorInvestido / this.novoAtivo.quantidadeCotas;
     }
 
-    this.isLoadingAcao = true; // Trava o botão
-
     if (this.novoAtivo.id) {
       this.ativoService.atualizarAtivo(this.novoAtivo.id, this.novoAtivo).subscribe({
         next: (ativoAtualizado) => {
@@ -161,12 +135,10 @@ iniciarSistema(): void {
           this.calcularPatrimonio();
           setTimeout(() => this.atualizarGrafico(), 1);
           this.limparFormulario();
-          this.isLoadingAcao = false; // Libera o botão
         },
         error: (erro) => {
           console.error(erro);
-          alert('Erro ao salvar. O servidor pode estar acordando, aguarde uns segundos e tente novamente.');
-          this.isLoadingAcao = false; // LIBERA O BOTÃO MESMO COM ERRO!
+          alert('Erro ao atualizar o ativo.');
         }
       });
     } else {
@@ -176,12 +148,10 @@ iniciarSistema(): void {
           this.calcularPatrimonio();
           setTimeout(() => this.atualizarGrafico(), 1);
           this.limparFormulario();
-          this.isLoadingAcao = false; // Libera o botão
         },
         error: (erro) => {
           console.error(erro);
-          alert('Erro ao salvar. O servidor pode estar acordando, aguarde uns segundos e tente novamente.');
-          this.isLoadingAcao = false; // LIBERA O BOTÃO MESMO COM ERRO!
+          alert('Erro ao salvar o ativo.');
         }
       });
     }
@@ -197,18 +167,15 @@ iniciarSistema(): void {
     if (id) {
       const confirmar = confirm('Tem certeza que deseja apagar este ativo e TODOS os dividendos dele?');
       if (confirmar) {
-        this.isLoadingAcao = true; 
         this.ativoService.excluirAtivo(id).subscribe({
           next: () => {
             this.ativos = this.ativos.filter(a => a.id !== id);
             this.calcularPatrimonio();
             this.carregarTodosDividendos(); 
             setTimeout(() => this.atualizarGrafico(), 1);
-            this.isLoadingAcao = false;
           },
           error: (erro) => {
-            alert('Erro ao excluir. Tente novamente.');
-            this.isLoadingAcao = false; // LIBERA O BOTÃO
+            alert('Erro ao excluir o ativo.');
           }
         });
       }
@@ -238,7 +205,6 @@ iniciarSistema(): void {
   adicionarDividendo(): void {
     if (this.ativoSelecionadoParaDividendo?.id) {
       this.novoDividendo.valor = this.tratarMoeda(this.novoDividendo.valor);
-      this.isLoadingAcao = true;
 
       if (this.novoDividendo.id) {
         this.ativoService.atualizarDividendo(this.ativoSelecionadoParaDividendo.id, this.novoDividendo).subscribe({
@@ -247,11 +213,9 @@ iniciarSistema(): void {
             if (index !== -1) this.dividendos[index] = divAtualizado;
             this.limparFormularioDividendo();
             this.carregarTodosDividendos(); 
-            this.isLoadingAcao = false;
           },
           error: (erro) => {
-            alert('Erro ao salvar dividendo. Tente novamente.');
-            this.isLoadingAcao = false; // LIBERA O BOTÃO
+            alert('Erro ao atualizar dividendo.');
           }
         });
       } else {
@@ -260,11 +224,9 @@ iniciarSistema(): void {
             this.dividendos.push(divSalvo); 
             this.limparFormularioDividendo();
             this.carregarTodosDividendos(); 
-            this.isLoadingAcao = false;
           },
           error: (erro) => {
-            alert('Erro ao salvar dividendo. Tente novamente.');
-            this.isLoadingAcao = false; // LIBERA O BOTÃO
+            alert('Erro ao salvar dividendo.');
           }
         });
       }
@@ -279,16 +241,13 @@ iniciarSistema(): void {
 
   removerDividendo(id: number | undefined): void {
     if (id) {
-      this.isLoadingAcao = true;
       this.ativoService.excluirDividendo(id).subscribe({
         next: () => {
           this.dividendos = this.dividendos.filter(div => div.id !== id);
           this.carregarTodosDividendos(); 
-          this.isLoadingAcao = false;
         },
         error: (erro) => {
-          alert('Erro ao excluir dividendo. Tente novamente.');
-          this.isLoadingAcao = false; // LIBERA O BOTÃO
+          alert('Erro ao excluir dividendo.');
         }
       });
     }
@@ -327,7 +286,6 @@ iniciarSistema(): void {
     });
   }
 
-  // padrão brasileiro
   formatarMoedaBR(valor: number): string {
     if (!valor) return '0,00';
     return valor.toLocaleString('pt-BR', {
@@ -350,25 +308,20 @@ iniciarSistema(): void {
       return;
     }
 
-    this.isLoadingCadastro = true;
     this.mensagemCadastro = '';
 
     this.ativoService.registrarUsuario(this.usuarioLogin, this.senhaLogin).subscribe({
       next: (resposta) => {
         this.mensagemCadastro = '✅ Conta criada com sucesso! Você já pode fazer login.';
-        this.isLoadingCadastro = false;
-        // Limpa a senha, mas deixa o usuário preenchido para facilitar o login
         this.senhaLogin = ''; 
         
-        // Volta para a tela de login depois de 2 segundos
         setTimeout(() => {
           this.modoCadastro = false;
           this.mensagemCadastro = '';
         }, 2500);
       },
       error: (erro) => {
-        this.mensagemCadastro = '❌ Erro: Este usuário já existe ou o servidor falhou.';
-        this.isLoadingCadastro = false;
+        this.mensagemCadastro = '❌ Erro: Este usuário já existe ou ocorreu uma falha.';
       }
     });
   }
