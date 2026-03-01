@@ -1,5 +1,6 @@
 package com.kaique.backend.controller;
 
+import com.kaique.backend.dto.AtivoResponseDTO;
 import com.kaique.backend.model.Ativo;
 import com.kaique.backend.model.Usuario;
 import com.kaique.backend.repository.AtivoRepository; // <-- Faltava importar
@@ -26,19 +27,23 @@ public class AtivoController {
     private final AtivoRepository ativoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    // 1. GET (Listar apenas os MEUS ativos) - Substituiu o antigo
+    // 1. GET (Listar apenas os MEUS ativos)
     @GetMapping
-    public ResponseEntity<List<Ativo>> listarMeusAtivos() {
+    public ResponseEntity<List<AtivoResponseDTO>> listarMeusAtivos() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String usernameLogado = auth.getName();
 
         List<Ativo> ativos = ativoRepository.findByUsuarioUsername(usernameLogado);
-        return ResponseEntity.ok(ativos);
+
+        List<AtivoResponseDTO> ativosDTO = ativos.stream()
+                .map(AtivoResponseDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(ativosDTO);
     }
 
-    // 2. POST (Salvar o ativo com o MEU crachá) - Substituiu o antigo
     @PostMapping
-    public ResponseEntity<Ativo> salvarMeuAtivo(@RequestBody Ativo ativo) {
+    public ResponseEntity<AtivoResponseDTO> salvarMeuAtivo(@RequestBody Ativo ativo) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String usernameLogado = auth.getName();
 
@@ -48,7 +53,8 @@ public class AtivoController {
         ativo.setUsuario(usuarioDono);
         
         Ativo novoAtivo = ativoRepository.save(ativo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoAtivo);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AtivoResponseDTO(novoAtivo));
     }
 
     // 3. DELETE (Mantido igual)
