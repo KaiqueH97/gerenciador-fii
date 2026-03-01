@@ -31,18 +31,18 @@
       }
 
       @if (!modoCadastro) {
-        <button (click)="fazerLogin()" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingLogin ? '0.7' : '1'">
-          {{ isLoadingLogin ? '⏳ Conectando...' : 'Entrar no Sistema' }}
+        <button (click)="fazerLogin()" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;">
+          Entrar no Sistema
         </button>
         <p style="margin: 0; color: var(--text-muted);">Não tem uma conta?</p>
         <button (click)="alternarModoLogin()" class="btn-secondary" style="width: 100%; margin-top: 5px;">
           Criar uma conta
         </button>
       } @else {
-        <button (click)="cadastrarUsuario()" class="btn-success" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;" [style.opacity]="isLoadingCadastro ? '0.7' : '1'">
-          {{ isLoadingCadastro ? '⏳ Criando...' : 'Finalizar Cadastro' }}
+        <button (click)="cadastrarUsuario()" class="btn-success" style="width: 100%; font-size: 1.1em; padding: 12px; transition: 0.3s; margin-bottom: 15px;">
+          Finalizar Cadastro
         </button>
-        <button (click)="alternarModoLogin()" class="btn-secondary" style="width: 100%;" >
+        <button (click)="alternarModoLogin()" class="btn-secondary" style="width: 100%;">
           Voltar para o Login
         </button>
       }
@@ -112,8 +112,8 @@
           </div>
           
           <div style="margin-top: 20px;">
-            <button type="submit" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
-              {{ isLoadingAcao ? '⏳ Salvando...' : 'Salvar Ativo' }}
+            <button type="submit" class="btn-primary">
+              Salvar Ativo
             </button>
             
             @if (novoAtivo.id) {
@@ -143,9 +143,7 @@
             <div class="ativo-actions">
               <button (click)="abrirDividendos(ativo)" class="btn-success" >💰 Ver Dividendos</button>
               <button (click)="prepararEdicao(ativo)" class="btn-warning" >✏️ Editar</button>
-              <button (click)="removerAtivo(ativo.id)" class="btn-danger" >
-                {{ isLoadingAcao ? '⏳' : '🗑️ Excluir' }}
-              </button>
+              <button (click)="removerAtivo(ativo.id)" class="btn-danger" >🗑️ Excluir</button>
             </div>
           </div>
         }
@@ -176,8 +174,8 @@
             </div>
             
             <div style="margin-top: 20px;">
-              <button type="submit" class="btn-primary" [style.opacity]="isLoadingAcao ? '0.7' : '1'">
-                {{ isLoadingAcao ? '⏳ Salvando...' : 'Salvar Dividendo' }}
+              <button type="submit" class="btn-primary">
+                Salvar Dividendo
               </button>
 
               @if (novoDividendo.id) {
