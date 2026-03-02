@@ -5,7 +5,10 @@ import com.kaique.backend.service.DividendoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import com.kaique.backend.repository.DividendoRepository;
 
 import java.util.List;
 
@@ -16,7 +19,8 @@ import java.util.List;
 public class DividendoController {
 
     private final DividendoService service;
-
+    private final DividendoRepository dividendoRepository;
+    
     // Rota para salvar um dividendo (Ex: POST /api/dividendos/ativo/1)
     @PostMapping("/ativo/{ativoId}")
     public ResponseEntity<Dividendo> adicionarDividendo(
@@ -34,8 +38,15 @@ public class DividendoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Dividendo>> buscarTodos() {
-        return ResponseEntity.ok(service.listarTodos());
+    public ResponseEntity<List<Dividendo>> listarMeusDividendos() {
+        // 1. Descobre quem está logado
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String usernameLogado = auth.getName();
+
+        // 2. Busca no banco APENAS os dividendos ligados aos ativos dessa pessoa
+        List<Dividendo> meusDividendos = dividendoRepository.findByAtivoUsuarioUsername(usernameLogado);
+        
+        return ResponseEntity.ok(meusDividendos);
     }
 
     // Rota DELETE (Ex: DELETE /api/dividendos/1)
