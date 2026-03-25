@@ -44,9 +44,7 @@ public class DividendoService {
     }
 
     public List<Dividendo> listarTodos() {
-        // Para este método funcionar, seu DividendoRepository precisa ter o método:
-        // List<Dividendo> findAllByAtivo_Usuario_Username(String username);
-        return dividendoRepository.findAllByAtivo_Usuario_Username(getUsernameLogado());
+        return dividendoRepository.findByAtivoUsuarioUsername(getUsernameLogado());
     }
 
     public void excluir(Long id) {
