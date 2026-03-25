@@ -10,4 +10,5 @@ import java.util.List;
 public interface DividendoRepository extends JpaRepository<Dividendo, Long> {
     
     List<Dividendo> findByAtivoId(Long ativoId);
+    List<Dividendo> findAllByAtivo_Usuario_Username(String username);
 }
