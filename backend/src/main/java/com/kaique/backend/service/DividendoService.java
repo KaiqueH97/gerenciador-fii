@@ -14,17 +14,14 @@ import java.util.List;
 public class DividendoService {
 
     private final DividendoRepository dividendoRepository;
-    private final AtivoRepository ativoRepository; // Precisamos acessar o banco de ativos também!
+    private final AtivoRepository ativoRepository; 
 
     public Dividendo salvar(Long ativoId, Dividendo dividendo) {
-        // Busca o ativo no banco. Se não achar, lança um erro.
         Ativo ativo = ativoRepository.findById(ativoId)
                 .orElseThrow(() -> new RuntimeException("Ativo não encontrado com o ID: " + ativoId));
         
-        // Associa o ativo encontrado ao dividendo
         dividendo.setAtivo(ativo);
         
-        // Salva o dividendo no banco de dados
         return dividendoRepository.save(dividendo);
     }
 

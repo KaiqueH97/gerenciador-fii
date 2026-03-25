@@ -22,16 +22,13 @@ public class SecurityConfig {
             .cors(withDefaults()) 
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                // LIBERAMOS a rota de cadastro para qualquer pessoa acessar sem precisar de senha!
                 .requestMatchers("/api/auth/**").permitAll() 
-                // Qualquer outra rota do sistema exige que o usuário esteja logado
                 .anyRequest().authenticated()
             )
             .httpBasic(withDefaults()); 
         return http.build();
     }
 
-    // A MÁGICA DA SEGURANÇA: Ensina o Java a criptografar as senhas no banco
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

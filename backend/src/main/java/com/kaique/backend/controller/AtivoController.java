@@ -3,8 +3,8 @@ package com.kaique.backend.controller;
 import com.kaique.backend.dto.AtivoResponseDTO;
 import com.kaique.backend.model.Ativo;
 import com.kaique.backend.model.Usuario;
-import com.kaique.backend.repository.AtivoRepository; // <-- Faltava importar
-import com.kaique.backend.repository.UsuarioRepository; // <-- Faltava importar
+import com.kaique.backend.repository.AtivoRepository; 
+import com.kaique.backend.repository.UsuarioRepository; 
 import com.kaique.backend.service.AtivoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,11 +23,9 @@ public class AtivoController {
 
     private final AtivoService service;
     
-    // Declarando os repositórios para o Java saber quem eles são
     private final AtivoRepository ativoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    // 1. GET (Listar apenas os MEUS ativos)
     @GetMapping
     public ResponseEntity<List<AtivoResponseDTO>> listarMeusAtivos() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -57,14 +55,12 @@ public class AtivoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new AtivoResponseDTO(novoAtivo));
     }
 
-    // 3. DELETE (Mantido igual)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirAtivo(@PathVariable Long id) {
         service.excluir(id);
         return ResponseEntity.noContent().build();
     }
 
-    // 4. PUT (Mantido igual)
     @PutMapping("/{id}")
     public ResponseEntity<Ativo> atualizarAtivo(@PathVariable Long id, @RequestBody Ativo ativo) {
         Ativo ativoAtualizado = service.atualizar(id, ativo); 

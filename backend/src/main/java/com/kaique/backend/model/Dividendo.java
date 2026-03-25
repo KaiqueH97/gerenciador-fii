@@ -18,13 +18,11 @@ public class Dividendo {
     private Long id;
 
     @Column(nullable = false)
-    private Double valor; // O valor que você recebeu, ex: 49.00
+    private Double valor; 
 
     @Column(nullable = false)
-    private LocalDate dataPagamento; // A data exata ou o mês que caiu na conta
+    private LocalDate dataPagamento; 
 
-    // Aqui está a mágica do banco relacional! 
-    // Isso diz que vários dividendos pertencem a um único Ativo.
     @ManyToOne
     @JoinColumn(name = "ativo_id", nullable = false)
     private Ativo ativo;

@@ -11,13 +11,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/dividendos")
-@CrossOrigin(origins = "*") // Liberando a passagem para o nosso Angular!
+@CrossOrigin(origins = "*") 
 @RequiredArgsConstructor
 public class DividendoController {
 
     private final DividendoService service;
 
-    // Rota para salvar um dividendo (Ex: POST /api/dividendos/ativo/1)
     @PostMapping("/ativo/{ativoId}")
     public ResponseEntity<Dividendo> adicionarDividendo(
             @PathVariable Long ativoId, 
@@ -27,7 +26,6 @@ public class DividendoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
-    // Rota para buscar todos os dividendos de um ativo (Ex: GET /api/dividendos/ativo/1)
     @GetMapping("/ativo/{ativoId}")
     public ResponseEntity<List<Dividendo>> buscarPorAtivo(@PathVariable Long ativoId) {
         return ResponseEntity.ok(service.listarPorAtivo(ativoId));
@@ -38,11 +36,9 @@ public class DividendoController {
         return ResponseEntity.ok(service.listarTodos());
     }
 
-    // Rota DELETE (Ex: DELETE /api/dividendos/1)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirDividendo(@PathVariable Long id) {
         service.excluir(id);
-        // O status 204 No Content significa "Deletado com sucesso, não tenho nada para retornar"
         return ResponseEntity.noContent().build(); 
     }
 

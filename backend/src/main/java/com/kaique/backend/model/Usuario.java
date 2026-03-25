@@ -17,7 +17,6 @@ public class Usuario {
     @Column(nullable = false)
     private String password;
 
-    // Relacionamento: Um usuário pode ter VÁRIOS ativos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Ativo> ativos;
 
@@ -28,7 +27,6 @@ public class Usuario {
         this.password = password;
     }
 
-    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

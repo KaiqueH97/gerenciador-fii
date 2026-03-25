@@ -17,16 +17,15 @@ public class Ativo {
     private Long id;
 
     @Column(nullable = false)
-    private String ticker; // Ex: MXRF11, ITSA4
+    private String ticker; 
 
     @Column(nullable = false)
-    private String tipo; // Ex: FII, ACAO, RENDA_FIXA
+    private String tipo; 
 
     private Integer quantidadeCotas;
 
     private Double precoMedio;
 
-    // Relacionamento: VÁRIOS ativos pertencem a UM usuário
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;

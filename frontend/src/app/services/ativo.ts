@@ -25,7 +25,6 @@ export class AtivoService {
 
   constructor(private http: HttpClient) { }
 
-  // Função que pega a senha salva no navegador e coloca no "envelope"
   private getHeaders(): { headers: HttpHeaders } {
     const token = localStorage.getItem('meuTokenDeAcesso') || '';
     return {
@@ -35,17 +34,13 @@ export class AtivoService {
     };
   }
 
-  // --- O TESTE ---
   testarLogin(usuario: string, senha: string): Observable<any> {
-    // btoa() é a função do JavaScript que embaralha a senha no formato Base64
     const token = btoa(usuario + ':' + senha); 
     const headers = new HttpHeaders({ 'Authorization': 'Basic ' + token });
     
-    // Tenta bater na porta dos ativos. Se o Java deixar entrar, a senha está certa!
     return this.http.get(this.apiUrlAtivos, { headers });
   }
 
-  // --- ATIVOS (Agora todos levam a credencial!) ---
   listarAtivos(): Observable<Ativo[]> {
     return this.http.get<Ativo[]>(this.apiUrlAtivos, this.getHeaders());
   }
@@ -62,7 +57,6 @@ export class AtivoService {
     return this.http.delete<void>(`${this.apiUrlAtivos}/${id}`, this.getHeaders());
   }
 
-  // --- DIVIDENDOS ---
   listarTodosDividendos(): Observable<Dividendo[]> {
     return this.http.get<Dividendo[]>(this.apiUrlDividendos, this.getHeaders());
   }
@@ -84,10 +78,8 @@ export class AtivoService {
   }
 
 registrarUsuario(usuario: string, senha: string): Observable<any> {
-    // Usando o link base do seu Render diretamente
     const url = 'https://gerenciador-fii.onrender.com/api/auth/register';
     
-    // O responseType: 'text' é super importante porque o nosso Java devolve um texto "Usuário criado" e não um JSON!
     return this.http.post(url, { username: usuario, password: senha }, { responseType: 'text' });
   }
 }
