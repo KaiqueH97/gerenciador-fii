@@ -33,17 +33,60 @@ O projeto foi construído separando completamente as responsabilidades entre Fro
 
 ## ⚙️ Funcionalidades Principais
 
-- [x] **Autenticação:** Sistema de login seguro.
-- [x] **Dashboard Visual:** Gráfico interativo mostrando a distribuição da carteira.
-- [x] **CRUD de Ativos:** Cadastro, edição, listagem e exclusão de ativos financeiros.
-- [x] **Cálculos Automáticos:** O sistema calcula o preço médio com base no valor total investido e a quantidade de cotas.
-- [x] **Gestão de Dividendos:** Lançamento de rendimentos atrelados a cada ativo específico, somando ao total de dividendos recebidos.
-- [x] **Estratégia de Cache (UX):** Uso de `localStorage` para carregamento instantâneo do dashboard (padrão Stale-While-Revalidate).
+Abaixo, apresentamos as principais funcionalidades do sistema com imagens demonstrativas extraídas diretamente da interface móvel.
+
+### 📈 1. Dashboard Visual e Indicadores Principais
+
+Ao logar, o usuário é recebido por um painel centralizado que fornece uma visão geral do seu patrimônio.
+
+- **Indicadores de Resumo:** Visualização instantânea do Patrimônio Total e do Total de Dividendos Recebidos.
+- **Gráfico Interativo:** Um gráfico de rosca dinâmico mostra a alocação percentual da carteira por classe de ativo (FIIs, Ações e Renda Fixa). É possível interagir para ver os valores absolutos.
+
+<figure align="center">
+  <img src="./docs/grafico.jpeg" alt="Tela do Dashboard Visual">
+  <figcaption>Painel de controle com resumo patrimonial e gráfico de alocação de ativos.</figcaption>
+</figure>
+
+---
+
+### 🛠️ 2. Gerenciamento Completo de Ativos (CRUD)
+
+Esta funcionalidade permite ao usuário construir e gerenciar sua carteira de forma intuitiva.
+
+- **Listagem da Carteira:** Visualização clara de todos os ativos cadastrados, organizados em cards informativos que mostram o ticker, tipo, quantidade e preço médio.
+- **Adicionar, Editar e Excluir:** Formulários dedicados para cada ação, permitindo o controle total sobre os registros.
+
+<figure align="center">
+  <img src="./docs/carteira.jpeg" alt="Tela de Listagem da Carteira">
+  <figcaption>Card principal mostrando a listagem de todos os ativos da carteira.</figcaption>
+</figure>
+
+<figure align="center">
+  <img src="./docs/addAtivo.jpeg" alt="Formulário para Adicionar Ativo">
+  <figcaption>Formulário para cadastro de novos ativos, demonstrando a interação e cálculos.</figcaption>
+</figure>
+
+- **Cálculos Automáticos:** O sistema calcula o preço médio de forma automática com base no valor total investido e a quantidade de cotas informadas.
+
+---
+
+### 💰 3. Gestão de Dividendos e Histórico
+
+Esta funcionalidade é essencial para o acompanhamento da renda passiva.
+
+- **Lançamento de Dividendos:** Lançamentos dedicados de rendimentos atrelados a ativos específicos da carteira.
+- **Histórico de Pagamentos:** Uma lista detalhada dos dividendos recebidos, organizada cronologicamente para o ativo selecionado.
+- **Ações de Edição e Exclusão:** Controle sobre o histórico de pagamentos.
+
+<figure align="center">
+  <img src="./docs/dividendo.jpeg" alt="Tela de Detalhes de Dividendos">
+  <figcaption>Visualização dos dividendos de um ativo específico, com formulário de lançamento e histórico.</figcaption>
+</figure>
 
 ---
 
 ## 👨‍💻 Autor
 
-**Kaique Santos** 📍 São Paulo, Brasil  
+**Kaique Santos** 📍 São Paulo, Brasil
 Estudante de Análise e Desenvolvimento de Sistemas
 * [LinkedIn](https://www.linkedin.com/in/kaiquehsfs/).
