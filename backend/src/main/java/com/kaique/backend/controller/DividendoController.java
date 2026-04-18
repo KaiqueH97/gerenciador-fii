@@ -1,10 +1,15 @@
 package com.kaique.backend.controller;
 
+import com.kaique.backend.model.Ativo;
 import com.kaique.backend.model.Dividendo;
+import com.kaique.backend.repository.AtivoRepository;
+import com.kaique.backend.repository.DividendoRepository;
 import com.kaique.backend.service.DividendoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,14 +21,26 @@ import java.util.List;
 public class DividendoController {
 
     private final DividendoService service;
+    private final AtivoRepository ativoRepository;
+    private final DividendoRepository dividendoRepository;
 
     @PostMapping("/ativo/{ativoId}")
-    public ResponseEntity<Dividendo> adicionarDividendo(
-            @PathVariable Long ativoId, 
-            @RequestBody Dividendo dividendo) {
-        
-        Dividendo salvo = service.salvar(ativoId, dividendo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+    public ResponseEntity<Dividendo> salvarDividendo(@PathVariable Long ativoId, @RequestBody Dividendo dividendo) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String usernameLogado = auth.getName();
+
+        Ativo ativo = ativoRepository.findById(ativoId)
+                .orElseThrow(() -> new RuntimeException("Ativo não encontrado"));
+
+        if (!ativo.getUsuario().getUsername().equals(usernameLogado)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        dividendo.setAtivo(ativo);
+
+        Dividendo novoDividendo = dividendoRepository.save(dividendo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoDividendo);
     }
 
     @GetMapping("/ativo/{ativoId}")
