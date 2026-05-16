@@ -43,7 +43,7 @@ Ao logar, o usuário é recebido por um painel centralizado que fornece uma vis�
 - **Gráfico Interativo:** Um gráfico de rosca dinâmico mostra a alocação percentual da carteira por classe de ativo (FIIs, Ações e Renda Fixa). É possível interagir para ver os valores absolutos.
 
 <figure align="center">
-  <img src="./docs/grafico.jpeg" width="300" alt="Tela do Dashboard Visual">
+  <img src="./docs/grafico.jpeg" width="250" alt="Tela do Dashboard Visual">
   <figcaption>Painel de controle com resumo patrimonial e gráfico de alocação de ativos.</figcaption>
 </figure>
 
@@ -57,12 +57,11 @@ Esta funcionalidade permite ao usuário construir e gerenciar sua carteira de fo
 - **Adicionar, Editar e Excluir:** Formulários dedicados para cada ação, permitindo o controle total sobre os registros.
 
 <figure align="center">
-  <img src="./docs/carteira.jpeg" width="300" alt="Tela de Listagem da Carteira">
+  <img src="./docs/carteira.jpeg" width="250" alt="Tela de Listagem da Carteira">
   <figcaption>Card principal mostrando a listagem de todos os ativos da carteira.</figcaption>
-</figure>
-
+</figure> <br> <br>
 <figure align="center">
-  <img src="./docs/addAtivo.jpeg" width="300" alt="Formulário para Adicionar Ativo">
+  <img src="./docs/addAtivo.jpeg" width="250" alt="Formulário para Adicionar Ativo">
   <figcaption>Formulário para cadastro de novos ativos, demonstrando a interação e cálculos.</figcaption>
 </figure>
 
@@ -79,7 +78,7 @@ Esta funcionalidade é essencial para o acompanhamento da renda passiva.
 - **Ações de Edição e Exclusão:** Controle sobre o histórico de pagamentos.
 
 <figure align="center">
-  <img src="./docs/dividendo.jpeg" width="300" alt="Tela de Detalhes de Dividendos">
+  <img src="./docs/dividendo.jpeg" width="250" alt="Tela de Detalhes de Dividendos">
   <figcaption>Visualização dos dividendos de um ativo específico, com formulário de lançamento e histórico.</figcaption>
 </figure>
 
